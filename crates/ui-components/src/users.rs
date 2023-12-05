@@ -39,7 +39,7 @@ pub fn users(users: Vec<User>) -> String {
                     label {r#for: "user_email", "Email:" }
                     input {
                         id: "user_email",
-                        name: "user[email]",
+                        name: "email",
                         r#type: "email",
                         required: "true",
                     }
