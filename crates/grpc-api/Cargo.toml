@@ -6,9 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-prost = "0.12.3"
+prost = "0.11.9"
 serde = { version = "1.0.193", features = ["derive"] }
-tonic = "0.10.2"
+tonic = "0.9.2"
 
 [build-dependencies]
-tonic-build = "0.10.2"
+tonic-build = "0.9.2"

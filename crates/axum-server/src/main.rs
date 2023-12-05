@@ -1,6 +1,9 @@
+mod api_service;
 mod config;
 mod errors;
+mod multiplex_service;
 
+use crate::api_service::UsersService;
 use crate::errors::CustomError;
 
 use axum::{
@@ -11,6 +14,13 @@ use axum::{
     routing::{get, post},
     Form, Router,
 };
+
+use self::multiplex_service::MultiplexService;
+
+use grpc_api::api::users_server::UsersServer;
+use http::{header::CONTENT_TYPE, Request};
+use tonic::transport::Server;
+use tower::{make::Shared, steer::Steer, BoxError, ServiceExt};
 
 use assets::templates::statics::StaticFile;
 
@@ -32,11 +42,21 @@ async fn main() {
         .layer(Extension(config))
         .layer(Extension(pool.clone()));
 
+    // grpc apiリクエストハンドル
+    let grpc = tonic::transport::Server::builder()
+        // .add_service(reflection_service)
+        .add_service(tonic_web::enable(UsersServer::new(UsersService { pool })))
+        .into_service();
+
+    // Create a service that can respond to Web and gRPC
+
+    let service = MultiplexService::new(app, grpc);
+
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     println!("Listening on {}", addr);
 
     axum::Server::bind(&addr)
-        .serve(app.into_make_service())
+        .serve(tower::make::Shared::new(service))
         .await
         .unwrap();
 }
