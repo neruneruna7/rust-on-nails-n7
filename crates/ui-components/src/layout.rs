@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use  dioxus::prelude::*;
+use dioxus::prelude::*;
 
 #[derive(Props)]
 pub struct AppLayoutProps<'a> {

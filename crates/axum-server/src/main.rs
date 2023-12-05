@@ -4,15 +4,18 @@ mod errors;
 use crate::errors::CustomError;
 
 use axum::{
-    extract::Extension,
-    response::{Html, Redirect, IntoResponse, Response},
+    body::{self, Body, Empty},
+    extract::{Extension, Path},
+    http::{header, HeaderValue, StatusCode},
+    response::{Html, IntoResponse, Redirect, Response},
     routing::{get, post},
-    Form,
-    Router, http::StatusCode,
+    Form, Router,
 };
 
-use serde::Deserialize;
+use assets::templates::statics::StaticFile;
+
 use db::User;
+use serde::Deserialize;
 use std::net::SocketAddr;
 use validator::Validate;
 
@@ -25,6 +28,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(users))
         .route("/sign_up", post(accept_form))
+        .route("/static/*path", get(static_path))
         .layer(Extension(config))
         .layer(Extension(pool.clone()));
 
@@ -64,10 +68,29 @@ async fn accept_form(
     // Todo - パスワードをハッシュ化する
     let hashed_password = String::from("aaaa");
     let _ = db::queries::users::create_user()
-    .bind(&client, &email.as_str(), &hashed_password.as_str())
-    .await?;
-
+        .bind(&client, &email.as_str(), &hashed_password.as_str())
+        .await?;
 
     // 303 redirect to user list
     Ok(Redirect::to("/").into_response())
+}
+
+async fn static_path(Path(path): Path<String>) -> impl IntoResponse {
+    let path = path.trim_start_matches('/');
+
+    if let Some(data) = StaticFile::get(path) {
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(
+                header::CONTENT_TYPE,
+                HeaderValue::from_str(data.mime.as_ref()).unwrap(),
+            )
+            .body(body::boxed(Body::from(data.content)))
+            .unwrap()
+    } else {
+        Response::builder()
+            .status(StatusCode::NOT_FOUND)
+            .body(body::boxed(Empty::new()))
+            .unwrap()
+    }
 }

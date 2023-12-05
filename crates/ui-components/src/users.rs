@@ -1,6 +1,6 @@
 use crate::layout::Layout;
 use db::User;
-use dioxus::prelude::{*, dioxus_elements::tbody};
+use dioxus::prelude::{dioxus_elements::tbody, *};
 
 struct Props {
     users: Vec<User>,
@@ -8,7 +8,6 @@ struct Props {
 
 // Vec<User> を取得し、HTML テーブルを作成します。
 pub fn users(users: Vec<User>) -> String {
-
     // rsx を作成するための内部関数
     fn app(cx: Scope<Props>) -> Element {
         cx.render(rsx!(
@@ -52,10 +51,7 @@ pub fn users(users: Vec<User>) -> String {
     }
 
     // コンポーネントを構築し、それを文字列にレンダリングします。
-    let mut app =  VirtualDom::new_with_props(app, Props {
-        users
-    },
-);
+    let mut app = VirtualDom::new_with_props(app, Props { users });
     let _ = app.rebuild();
     dioxus::ssr::render_vdom(&app)
 }

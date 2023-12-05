@@ -47,24 +47,22 @@ impl ServerCertVerifier for DummyTlsVerifier {
 
 include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
     #[tokio::test]
     async fn load_users() {
-
         let db_url = std::env::var("DATABASE_URL").unwrap();
         let pool = create_pool(&db_url);
 
         let client = pool.get().await.unwrap();
-    
+
         let users = crate::queries::users::get_users()
             .bind(&client)
             .all()
             .await
             .unwrap();
-    
+
         dbg!(users);
     }
 }
