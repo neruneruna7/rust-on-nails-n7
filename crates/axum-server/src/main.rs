@@ -5,7 +5,7 @@ use crate::errors::CustomError;
 
 use axum::{
     extract::Extension,
-    response::Json,
+    response::{Json, Html},
     routing::get,
     Router
 };
@@ -35,8 +35,9 @@ async fn main() {
 
 async fn users(
     Extension(pool): Extension<db::Pool>,
-) -> Result<Json<Vec<User>>, CustomError> {
+) -> Result<Html<String>, CustomError> {
     let client = pool.get().await?;
     let users = db::queries::users::get_users().bind(&client).all().await?;
-    Ok(Json(users))
+
+    Ok(Html(ui_components::users::users(users)))
 }
