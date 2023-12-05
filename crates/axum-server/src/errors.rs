@@ -3,8 +3,8 @@ use axum::{
     response::{IntoResponse, Response},
 };
 
+use db::{PoolError, TokioPostgressError};
 use std::fmt;
-use db::{TokioPostgressError, PoolError};
 
 #[derive(Debug)]
 pub enum CustomError {
