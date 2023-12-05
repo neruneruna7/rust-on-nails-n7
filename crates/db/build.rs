@@ -34,4 +34,3 @@ fn cornucopia() {
         panic!("{}", &std::str::from_utf8(&output.stderr).unwrap());
     }
 }
-

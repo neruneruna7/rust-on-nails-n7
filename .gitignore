@@ -1,1 +1,5 @@
 target
+dist
+node_modules
+.percel-cache
+crates/asset-pipeline/dist
