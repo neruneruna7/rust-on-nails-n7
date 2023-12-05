@@ -1,4 +1,0 @@
-proto < crates/grpc-api/protos/api.proto
-
-GRPC http://localhost:3000/api/Fortunes/GetFortunes
-{}
